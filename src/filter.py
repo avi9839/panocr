@@ -49,13 +49,21 @@ def main():
     #cv2.waitKey(0)
     #gray=cv2.cvtColor(img2,cv2.COLOR_bina)
     img2,contours,hierarchy = cv2.findContours(th1, cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
+    ct = 0
     for cnt in contours:
         x,y,w,h = cv2.boundingRect(cnt)
-        if(w>h):
-            cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
+        if(h > 5 and w>20 and w > h):
+            tempimg = cv2.cvtColor(img[y:y+h, x:x+w, :], cv2.COLOR_RGB2GRAY)
+            
+            ret,th1 = cv2.threshold(tempimg,127,255,cv2.THRESH_BINARY)
+            #cv2.imshow('temp img', tempimg)
+            #cv2.waitKey(0)
+            cv2.imwrite(str(ct)+'_img.jpg', th1)
+            ct += 1
+            #cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
 
-    cv2.imshow('Text detection', img)
-    cv2.waitKey(0)
+    #cv2.imshow('Text detection', img)
+    #cv2.waitKey(0)
     os.remove('temp_filter.jpg')
 
     #pilImg = Image.open("D:/pan.jpg")
