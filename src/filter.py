@@ -3,6 +3,7 @@ import numpy as np
 import pytesseract
 from PIL import Image
 import os
+pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files (x86)/Tesseract-OCR/tesseract'
 
 def findConnectedComponent(img):
     nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(img, connectivity=8)
@@ -28,7 +29,7 @@ def main():
     img2,contours,hierarchy = cv2.findContours(th1, cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
     #cv2.imshow('img', th1)
     #cv2.waitKey(0)
-    
+    cv2.imwrite('exep.png', th1)
     img1 = findConnectedComponent(th1)
     
     #img2 = 255-img2
@@ -50,27 +51,41 @@ def main():
     #gray=cv2.cvtColor(img2,cv2.COLOR_bina)
     img2,contours,hierarchy = cv2.findContours(th1, cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
     ct = 0
+    blank_image = np.zeros((img.shape[0],img.shape[1],3), np.uint8)
     for cnt in contours:
         x,y,w,h = cv2.boundingRect(cnt)
         if(h > 5 and w>20 and w > h):
-            tempimg = cv2.cvtColor(img[y:y+h, x:x+w, :], cv2.COLOR_RGB2GRAY)
+            tempimg = img[y:y+h, x:x+w, :]
             
-            ret,th1 = cv2.threshold(tempimg,127,255,cv2.THRESH_BINARY)
-            #cv2.imshow('temp img', tempimg)
-            #cv2.waitKey(0)
-            cv2.imwrite(str(ct)+'_img.jpg', th1)
-            ct += 1
+            #ret,th1 = cv2.threshold(tempimg,127,255,cv2.THRESH_BINARY)
+            ##cv2.imshow('temp img', tempimg)
+            ##cv2.waitKey(0)
+            #cv2.imwrite(str(ct)+'_img.jpg', th1)
+            #ct += 1
             #cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
+            blank_image[y:y+h, x:x+w,:] = tempimg
 
-    #cv2.imshow('Text detection', img)
-    #cv2.waitKey(0)
-    os.remove('temp_filter.jpg')
+    cv2.imshow('Text detection', blank_image)
+    cv2.waitKey(0)
+    #os.remove('D:/img.jpg')
 
-    #pilImg = Image.open("D:/pan.jpg")
-    ##pilImg.show()
-    #text = pytesseract.image_to_string(pilImg)
-    #print(text)
+    pilImg = Image.open('exep.png')
+    #pilImg.show()
+    
+    text = pytesseract.image_to_string(pilImg)
+    print(text.encode("utf-8"))
 
+def ocrImg(img):
+    img = cv2.imread(img)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    ret,th1 = cv2.threshold(gray,127,255,cv2.THRESH_BINARY)
+    cv2.imshow('th1', th1)
+    cv2.waitKey()
+    cv2.imwrite('filterImg.png', th1)
+    pilImg = Image.open('filterimg.png')
+    text = pytesseract.image_to_string(pilImg)
+    print(text.encode("utf-8"))
 
 if __name__ == "__main__":
     main()
+    
