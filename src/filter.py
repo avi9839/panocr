@@ -67,13 +67,7 @@ def main():
 
     cv2.imshow('Text detection', blank_image)
     cv2.waitKey(0)
-    #os.remove('D:/img.jpg')
-
-    pilImg = Image.open('exep.png')
-    #pilImg.show()
     
-    text = pytesseract.image_to_string(pilImg)
-    print(text.encode("utf-8"))
 
 def ocrImg(img):
     img = cv2.imread(img)
